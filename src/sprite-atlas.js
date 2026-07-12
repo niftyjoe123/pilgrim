@@ -6,7 +6,12 @@
 function sheet(src, pitch, tile){
   const s = {img: new Image(), pitch, tile, loaded: false};
   s.img.onload = () => { s.loaded = true; };
-  s.img.src = src;
+  // resolve relative to this module's own URL (like an import specifier
+  // would), not the document's URL — img.src otherwise resolves against
+  // the page location, which breaks under a non-root path like GitHub
+  // Pages' /pilgrim/ (it only worked locally by coincidence, serving
+  // from the domain root).
+  s.img.src = new URL(src, import.meta.url).href;
   return s;
 }
 
