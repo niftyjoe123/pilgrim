@@ -1,0 +1,20 @@
+export const ITEMS = [
+  {id:'s1', map:'world',    x:7,  y:13, icon:'scroll', taken:false,
+   verse:{ref:'Psalm 119:105', text:'Thy word is a lamp unto my feet, and a light unto my path.'}},
+  {id:'s2', map:'home',     x:10, y:6,  icon:'scroll', taken:false,
+   verse:{ref:'Matthew 11:28', text:'Come unto me, all ye that labour and are heavy laden, and I will give you rest.'}},
+  {id:'s3', map:'timorous', x:6,  y:3,  icon:'scroll', taken:false,
+   verse:{ref:'Psalm 46:1', text:'God is our refuge and strength, a very present help in trouble.'}},
+  {id:'s4', map:'sagacity', x:9,  y:6,  icon:'scroll', taken:false,
+   verse:{ref:'John 14:6', text:'I am the way, the truth, and the life: no man cometh unto the Father, but by me.'}},
+  {id:'s5', map:'obst',     x:9,  y:6,  icon:'scroll', taken:false,
+   verse:{ref:'Proverbs 16:18', text:'Pride goeth before destruction, and an haughty spirit before a fall.'}},
+  {id:'s6', map:'world',    x:24, y:15, icon:'scroll', taken:false,
+   verse:{ref:'Psalm 23:4', text:'Yea, though I walk through the valley of the shadow of death, I will fear no evil.'}},
+  {id:'s7', map:'world',    x:44, y:12, icon:'scroll', taken:false,
+   verse:{ref:'Isaiah 30:21', text:'This is the way, walk ye in it.'}},
+  {id:'s8', map:'world',    x:53, y:14, icon:'scroll', taken:false,
+   verse:{ref:'Proverbs 3:5', text:'Trust in the LORD with all thine heart; and lean not unto thine own understanding.'}},
+  {id:'key', map:'world',   x:3,  y:19, icon:'key', taken:false,
+   item:{name:'Key of Promise', note:'A small key of strange warmth. You sense it will matter greatly, much later on the road (they say a giant keeps a castle of doubt…).'}}
+];

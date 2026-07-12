@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Pilgrim: The Road to the Celestial City — Act I</title>
+<style>
+  :root{
+    --bg:#1a1410; --card:#f5ecd7; --card-edge:#d9c9a3; --ink:#2b2115;
+    --gold:#b8860b; --gold-bright:#d4a017; --red:#8b2500; --green:#3d6b35;
+    --shadow:rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
+  html,body{margin:0; padding:0; background:var(--bg); min-height:100%; overscroll-behavior:none;}
+  body{
+    font-family:Georgia,'Times New Roman',serif; color:var(--ink);
+    background:radial-gradient(ellipse at 50% -10%, #2e2418 0%, #1a1410 60%);
+    display:flex; flex-direction:column; align-items:center;
+    padding:8px; padding-bottom:20px;
+  }
+  #app{width:100%; max-width:860px;}
+  header{text-align:center; color:#e8d9b0; padding:6px 0 2px;}
+  header h1{font-size:clamp(1rem,3.5vw,1.35rem); margin:0; letter-spacing:.12em; font-variant:small-caps;}
+  header .sub{font-size:.7rem; opacity:.65; letter-spacing:.2em; text-transform:uppercase; margin-top:1px;}
+
+  #status{display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin:8px 0 4px; font-size:.76rem;}
+  .chip{background:#2e2418; color:#e8d9b0; border:1px solid #4a3b26; border-radius:20px; padding:3px 9px; display:flex; align-items:center; gap:4px;}
+  .chip b{color:var(--gold-bright); min-width:1em; text-align:center;}
+  .chip.btn{cursor:pointer;}
+  .chip.btn:hover{border-color:var(--gold);}
+  .chip.bump b{animation:bump .5s ease;}
+  @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.6); color:#fff}100%{transform:scale(1)}}
+
+  #resolveWrap{margin:0 auto 2px; padding:0 2px;}
+  #resolveLabel{color:#e8d9b0; font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; display:flex; justify-content:space-between; padding:0 2px 2px;}
+  #resolveBar{height:9px; background:#2e2418; border:1px solid #4a3b26; border-radius:6px; overflow:hidden;}
+  #resolveFill{height:100%; width:100%; background:linear-gradient(90deg,#8b2500,#d4a017); transition:width .5s ease; border-radius:6px;}
+  #objective{text-align:center; color:#b09a6f; font-size:.78rem; font-style:italic; margin:5px 0 7px; min-height:1.1em; padding:0 8px;}
+
+  #gameWrap{position:relative; width:100%;}
+  canvas{
+    display:block; width:100%; border-radius:10px;
+    border:1px solid #4a3b26; box-shadow:0 10px 40px var(--shadow);
+    image-rendering:pixelated; background:#12261a;
+  }
+
+  /* d-pad */
+  #dpad{
+    position:absolute; right:10px; bottom:10px; z-index:5;
+    display:grid; grid-template-columns:repeat(3,48px); grid-template-rows:repeat(3,48px);
+    gap:2px; opacity:.85; user-select:none;
+  }
+  #dpad button{
+    font-size:1.15rem; border-radius:10px; border:1px solid var(--gold);
+    background:rgba(46,36,24,.82); color:#ecdcb2; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #dpad button:active{background:rgba(184,134,11,.6);}
+  #dpad .blank{visibility:hidden;}
+  @media (min-width:900px){ #dpad{opacity:.4;} #dpad:hover{opacity:.85;} }
+
+  /* dialogue modal */
+  #overlay{
+    position:absolute; inset:0; z-index:8; display:none;
+    background:rgba(15,10,5,.6); border-radius:10px;
+    align-items:center; justify-content:center; padding:10px;
+  }
+  #overlay.show{display:flex;}
+  #dlg{
+    background:var(--card); border:1px solid var(--card-edge); border-radius:10px;
+    max-width:560px; width:100%; max-height:92%; overflow-y:auto;
+    box-shadow:0 12px 50px rgba(0,0,0,.7); animation:fadein .35s ease;
+  }
+  @keyframes fadein{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+  #dlgBanner{padding:14px 16px 10px; text-align:center; color:#f5ecd7; background:linear-gradient(160deg,#3b3021,#241c12); border-bottom:3px double var(--gold);}
+  #dlgBanner .glyph{font-size:1.9rem; display:block; margin-bottom:2px;}
+  #dlgBanner h2{margin:0; font-size:1.1rem; font-variant:small-caps; letter-spacing:.08em; color:#ecdcb2;}
+  #dlgText{padding:14px 18px 4px; font-size:.98rem; line-height:1.6;}
+  #dlgText p{margin:0 0 12px;}
+  #dlgText .speech{font-style:italic; color:#4a3417; padding-left:12px; border-left:3px solid var(--gold);}
+  #dlgText .verse{background:#efe2c0; border:1px dashed var(--gold); border-radius:8px; padding:9px 12px; font-style:italic; font-size:.92em; margin:0 0 12px; color:#5a4520;}
+  #dlgText .verse b{display:block; font-style:normal; font-size:.78em; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-top:3px;}
+  #dlgChoices{padding:4px 14px 16px; display:flex; flex-direction:column; gap:8px;}
+  button.choice{
+    font-family:inherit; font-size:.95rem; text-align:left; cursor:pointer;
+    background:linear-gradient(180deg,#fdf6e3,#efe2c0); border:1px solid var(--gold);
+    border-radius:8px; padding:12px 14px; color:var(--ink); line-height:1.35; min-height:48px;
+  }
+  button.choice:hover{box-shadow:0 3px 12px rgba(184,134,11,.35);}
+  button.choice.locked{opacity:.55; cursor:not-allowed; background:#e8ddc2;}
+  button.choice .req{display:block; font-size:.73rem; color:var(--green); margin-top:2px;}
+  button.choice.locked .req{color:var(--red);}
+
+  #toast{
+    position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(90px);
+    background:#2e2418; color:#ecdcb2; border:1px solid var(--gold); border-radius:10px;
+    padding:10px 16px; font-size:.86rem; max-width:90vw; box-shadow:0 6px 24px var(--shadow);
+    transition:transform .4s ease; z-index:20; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  footer{color:#6b5a3e; font-size:.68rem; text-align:center; margin-top:10px; letter-spacing:.08em;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Pilgrim</h1>
+    <div class="sub">The Road to the Celestial City · Act I</div>
+  </header>
+
+  <div id="status"></div>
+  <div id="resolveWrap">
+    <div id="resolveLabel"><span>Resolve</span><span id="resolveNum"></span></div>
+    <div id="resolveBar"><div id="resolveFill"></div></div>
+  </div>
+  <div id="objective"></div>
+
+  <div id="gameWrap">
+    <canvas id="cv"></canvas>
+    <div id="dpad">
+      <button class="blank"></button><button data-d="up">▲</button><button class="blank"></button>
+      <button data-d="left">◀</button><button class="blank"></button><button data-d="right">▶</button>
+      <button class="blank"></button><button data-d="down">▼</button><button class="blank"></button>
+    </div>
+    <div id="overlay">
+      <div id="dlg">
+        <div id="dlgBanner"><span class="glyph" id="dlgGlyph"></span><h2 id="dlgTitle"></h2></div>
+        <div id="dlgText"></div>
+        <div id="dlgChoices"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Walk with arrow keys / WASD or the pad · walk into people, doors &amp; things to engage them</footer>
+</div>
+<div id="toast"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
