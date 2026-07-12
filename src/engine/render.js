@@ -5,6 +5,7 @@ import {BASE_PAL, SPR} from '../sprites.js';
 import {stepNow} from './input.js';
 
 const cv=$("cv"), ctx=cv.getContext("2d");
+const mm=$("minimap"), mctx=mm.getContext("2d");
 let TILE=40, VW=0, VH=0;
 
 function mapW(){ return LIVE[cur][0].length; }
@@ -385,6 +386,42 @@ function drawTile(t,x,y,px,py){
   }
 }
 
+/* At-a-glance overview of the 'world' map — the only map big enough that
+   the zoomed-in camera can make it hard to tell where you are. Interiors
+   already fit on screen, so it's hidden there. (Coupled to the map named
+   'world' specifically; if a future act adds its own big outdoor map under
+   a different name, this will need to know about it too.) */
+const MM_TILE = 2;
+const MM_GROUND = {'#':'#2e5526', '.':'#3f6b34', '=':'#8a744a', '~':'#22302b', 'o':'#7d868c',
+  'w':'#5c5c63', 'h':'#5c5c63', 'i':'#5c5c63', '^':'#4a352a', 'r':'#6e3826'};
+const MM_LANDMARK = new Set(['g','D','I','X','+','E']);
+let mmSized = false;
+
+function sizeMinimap(){
+  if(mmSized || !LIVE.world) return;
+  mm.width = LIVE.world[0].length * MM_TILE;
+  mm.height = LIVE.world.length * MM_TILE;
+  mmSized = true;
+}
+
+function drawMinimap(){
+  sizeMinimap();
+  if(cur !== 'world' || !mmSized){ mm.style.display='none'; return; }
+  mm.style.display='block';
+  const rows = LIVE.world;
+  for(let y=0;y<rows.length;y++) for(let x=0;x<rows[y].length;x++){
+    const t = rows[y][x];
+    mctx.fillStyle = MM_LANDMARK.has(t) ? '#ffd75e' : (MM_GROUND[t] || '#3f6b34');
+    mctx.fillRect(x*MM_TILE, y*MM_TILE, MM_TILE, MM_TILE);
+  }
+  mctx.globalAlpha = 0.6+0.4*Math.sin(performance.now()/300);
+  mctx.fillStyle = '#ffffff';
+  mctx.beginPath();
+  mctx.arc(player.x*MM_TILE+MM_TILE/2, player.y*MM_TILE+MM_TILE/2, MM_TILE*1.6, 0, 7);
+  mctx.fill();
+  mctx.globalAlpha = 1;
+}
+
 function draw(){
   const MW=mapW(), MH=mapH();
   const mapPW=MW*TILE, mapPH=MH*TILE;
@@ -415,6 +452,7 @@ function draw(){
   }
 
   drawPlayer(player.x*TILE-camX, player.y*TILE-camY);
+  drawMinimap();
 }
 
 function loop(){

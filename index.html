@@ -44,6 +44,13 @@
     image-rendering:pixelated; background:#12261a;
   }
 
+  /* minimap: fixed-size corner overlay, world map only */
+  #minimap{
+    position:absolute; left:10px; top:10px; z-index:4;
+    width:150px; height:auto; opacity:.92;
+    border:1px solid var(--gold); box-shadow:0 4px 14px var(--shadow);
+  }
+
   /* d-pad */
   #dpad{
     position:absolute; right:10px; bottom:10px; z-index:5;
@@ -54,6 +61,7 @@
     font-size:1.15rem; border-radius:10px; border:1px solid var(--gold);
     background:rgba(46,36,24,.82); color:#ecdcb2; cursor:pointer; padding:0;
     display:flex; align-items:center; justify-content:center;
+    touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
   }
   #dpad button:active{background:rgba(184,134,11,.6);}
   #dpad .blank{visibility:hidden;}
@@ -117,6 +125,7 @@
 
   <div id="gameWrap">
     <canvas id="cv"></canvas>
+    <canvas id="minimap"></canvas>
     <div id="dpad">
       <button class="blank"></button><button data-d="up">▲</button><button class="blank"></button>
       <button data-d="left">◀</button><button class="blank"></button><button data-d="right">▶</button>
