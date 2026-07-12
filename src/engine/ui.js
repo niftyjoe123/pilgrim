@@ -2,6 +2,8 @@ import {$, toast} from './dom.js';
 import {S, cur, STAT_META, applyFx, addVerse} from './state.js';
 import {DLG, MAP_NAMES, actOf} from '../../data/index.js';
 import {doAct} from './actions.js';
+import {saveGame} from './save.js';
+import {sfxDialogue} from './audio.js';
 
 export let dlgOpen = false;
 let bumped = {};
@@ -42,6 +44,7 @@ function dynamicText(id){
 export function openDlg(id){
   const d=DLG[id]; if(!d) return;
   dlgOpen=true; $("overlay").classList.add("show");
+  sfxDialogue();
   $("dlgGlyph").textContent=d.glyph; $("dlgTitle").textContent=d.title;
   const paras = d.dynamic? dynamicText(id) : d.text;
   $("dlgText").innerHTML=paras.map(p=>p.startsWith("<")?p:`<p>${p}</p>`).join("");
@@ -62,6 +65,7 @@ export function openDlg(id){
       if(d.onEnd && (c.end||c.next)) { if(d.onEnd.verse) addVerse(d.onEnd.verse); }
       if(c.act) doAct(c.act);
       renderStatus();
+      saveGame();
       if(c.next){ openDlg(c.next); }
       else closeDlg();
     };

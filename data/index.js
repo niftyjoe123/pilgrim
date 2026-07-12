@@ -15,9 +15,17 @@ import {ITEMS as act2Items} from './acts/act2/items.js';
 import {DLG as act2Dlg} from './acts/act2/dialogue.js';
 import {ACTIONS as act2Actions} from './acts/act2/actions.js';
 
+import * as act3Meta from './acts/act3/meta.js';
+import {MAPS as act3Maps, WARPS as act3Warps} from './acts/act3/maps.js';
+import {NPCS as act3Npcs} from './acts/act3/npcs.js';
+import {ITEMS as act3Items} from './acts/act3/items.js';
+import {DLG as act3Dlg} from './acts/act3/dialogue.js';
+import {ACTIONS as act3Actions} from './acts/act3/actions.js';
+
 const acts = [
   {meta: act1Meta, maps: act1Maps, warps: act1Warps, npcs: act1Npcs, items: act1Items, dlg: act1Dlg, actions: act1Actions},
-  {meta: act2Meta, maps: act2Maps, warps: act2Warps, npcs: act2Npcs, items: act2Items, dlg: act2Dlg, actions: act2Actions}
+  {meta: act2Meta, maps: act2Maps, warps: act2Warps, npcs: act2Npcs, items: act2Items, dlg: act2Dlg, actions: act2Actions},
+  {meta: act3Meta, maps: act3Maps, warps: act3Warps, npcs: act3Npcs, items: act3Items, dlg: act3Dlg, actions: act3Actions}
 ];
 
 export const MAPS = {};
@@ -43,7 +51,15 @@ for(const act of acts){
 }
 
 export const FIRST_ACT = acts[0].meta;
+export const START_MAPS = acts.map(a => a.meta.startMap);
 
 export function actOf(mapName){
   return mapToAct[mapName];
+}
+
+// Called after a save is loaded (buildMaps rebuilds LIVE from pristine MAPS,
+// discarding any tile mutations flags implied happened before saving).
+// Optional per-act hook — most acts have no LIVE-tile mutations at all.
+export function reapplyWorldMutations(S, LIVE){
+  for(const act of acts) if(act.meta.reapplyWorld) act.meta.reapplyWorld(S, LIVE);
 }

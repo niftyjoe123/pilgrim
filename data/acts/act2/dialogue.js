@@ -91,6 +91,7 @@ act2Finale:{glyph:'🏔', title:'End of Act II', text:[
   'Ahead lies the Valley of Humiliation — and somewhere in it, they say, a foul fiend named Apollyon does not intend to let you pass.',
   '<b>— ACT II COMPLETE —</b>'],
  choices:[
+  {label:'Continue toward the Valley of Humiliation.', act:'startAct3', end:true},
   {label:'View your pilgrim\'s record.', next:'summary'},
   {label:'Keep wandering the map.', end:true},
   {label:'Begin the journey again.', act:'restart'}]}

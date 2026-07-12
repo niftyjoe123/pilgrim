@@ -3,6 +3,9 @@ import {toast} from './dom.js';
 import {openDlg, renderStatus, dlgOpen} from './ui.js';
 import {WARPS, NPCS, ITEMS, MAP_NAMES, actOf} from '../../data/index.js';
 import {BLOCKED, HAZARDS} from '../../data/tiles.js';
+import {saveGame} from './save.js';
+import {sfxPickup, sfxWarp, sfxHazard} from './audio.js';
+import {isBattleOpen} from './battle.js';
 
 function tileAt(x,y){ const M=LIVE[cur]; return (M[y]&&M[y][x])||'#'; }
 function npcAt(x,y){ return NPCS.find(n=>n.map===cur&&n.x===x&&n.y===y&&!(n.gone&&n.gone())); }
@@ -12,12 +15,14 @@ export function warpTo(w){
   setCur(w.map); player.x=w.x; player.y=w.y; player.moveT=performance.now();
   if(MAP_NAMES[cur]) toast('📍 '+MAP_NAMES[cur]);
   renderStatus();
+  saveGame();
+  sfxWarp();
 }
 
 let lastSwampToast=0;
 const lastHazardToast={}; // per-glyph, so bumping two different hazards close together doesn't suppress the second
 export function tryStep(dx,dy){
-  if(dlgOpen) return;
+  if(dlgOpen || isBattleOpen()) return;
   player.face = dx===1?'right' : dx===-1?'left' : dy===1?'down' : 'up';
   const nx=player.x+dx, ny=player.y+dy;
   const t=tileAt(nx,ny);
@@ -46,6 +51,7 @@ export function tryStep(dx,dy){
       S.resolve=Math.max(1,S.resolve-HAZARDS[t].cost);
       toast(HAZARDS[t].message);
       renderStatus();
+      sfxHazard();
     }
     return;
   }
@@ -58,6 +64,8 @@ export function tryStep(dx,dy){
     if(it.verse){ addVerse(it.verse); }
     if(it.item){ S.items.push(it.item); toast(`🗝 Taken: <b>${it.item.name}</b> — ${it.item.note}`); }
     renderStatus();
+    saveGame();
+    sfxPickup();
   }
   if(t==='~'){
     const cost = S.burden? 2:1;
@@ -90,6 +98,7 @@ export function tryStep(dx,dy){
     if(!S.flags[endedFlag]){
       S.flags[endedFlag] = true;
       renderStatus();
+      saveGame();
       openDlg(act.id + 'Finale');
     }
   }

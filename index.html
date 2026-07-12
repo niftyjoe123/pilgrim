@@ -19,9 +19,14 @@
     padding:8px; padding-bottom:20px;
   }
   #app{width:100%; max-width:860px;}
-  header{text-align:center; color:#e8d9b0; padding:6px 0 2px;}
+  header{text-align:center; color:#e8d9b0; padding:6px 0 2px; position:relative;}
   header h1{font-size:clamp(1rem,3.5vw,1.35rem); margin:0; letter-spacing:.12em; font-variant:small-caps;}
   header .sub{font-size:.7rem; opacity:.65; letter-spacing:.2em; text-transform:uppercase; margin-top:1px;}
+  #muteBtn{
+    position:absolute; right:6px; top:6px; background:none; border:1px solid #4a3b26;
+    border-radius:8px; color:#e8d9b0; font-size:.95rem; padding:3px 7px; cursor:pointer; line-height:1;
+  }
+  #muteBtn:hover{border-color:var(--gold);}
 
   #status{display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin:8px 0 4px; font-size:.76rem;}
   .chip{background:#2e2418; color:#e8d9b0; border:1px solid #4a3b26; border-radius:20px; padding:3px 9px; display:flex; align-items:center; gap:4px;}
@@ -99,6 +104,44 @@
   button.choice .req{display:block; font-size:.73rem; color:var(--green); margin-top:2px;}
   button.choice.locked .req{color:var(--red);}
 
+  #battleOverlay{
+    position:absolute; inset:0; z-index:9; display:none;
+    background:rgba(10,5,5,.72); border-radius:10px;
+    align-items:center; justify-content:center; padding:10px;
+  }
+  #battleOverlay.show{display:flex;}
+  #battleCard{
+    background:var(--card); border:1px solid var(--card-edge); border-radius:10px;
+    max-width:480px; width:100%; overflow-y:auto; padding:16px 18px 18px;
+    box-shadow:0 12px 50px rgba(0,0,0,.75); animation:fadein .35s ease; text-align:center;
+  }
+  #battleCard h2{margin:2px 0 10px; font-variant:small-caps; letter-spacing:.08em; color:var(--red);}
+  #battleCard .glyph{font-size:1.9rem; display:block;}
+  #battleHpLabel{color:#5a4520; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; display:flex; justify-content:space-between; padding:0 2px 3px;}
+  #battleHpBar{height:11px; background:#e8ddc2; border:1px solid var(--gold); border-radius:6px; overflow:hidden; margin-bottom:10px;}
+  #battleFill{height:100%; background:linear-gradient(90deg,#3a0a0a,#8b2500); transition:width .4s ease;}
+  #battleTelegraph{font-style:italic; color:#5a4520; font-size:.9rem; margin-bottom:8px; min-height:1.3em;}
+  #battleLog{background:#efe2c0; border:1px dashed var(--gold); border-radius:8px; padding:8px 10px; font-size:.85rem; color:#4a3417; margin-bottom:12px; min-height:2.6em;}
+  #battleActions{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  #battleActions button{grid-column:span 1;}
+
+  #titleScreen{
+    position:fixed; inset:0; z-index:40; display:none;
+    align-items:center; justify-content:center; padding:20px;
+    background:radial-gradient(ellipse at 50% 30%, #2e2418 0%, #14100a 70%);
+  }
+  #titleScreen.show{display:flex;}
+  #titleCard{
+    text-align:center; max-width:420px; width:100%;
+    background:var(--card); border:1px solid var(--card-edge); border-radius:10px;
+    padding:28px 24px 24px; box-shadow:0 12px 50px rgba(0,0,0,.7); animation:fadein .4s ease;
+  }
+  #titleCard h1{font-size:2rem; margin:0; letter-spacing:.14em; font-variant:small-caps; color:var(--ink);}
+  #titleCard .sub{font-size:.78rem; opacity:.7; letter-spacing:.18em; text-transform:uppercase; margin:4px 0 22px;}
+  #titleCard button.choice{width:100%; margin-bottom:10px; text-align:center;}
+  #titleCard button.choice:disabled{opacity:.45; cursor:not-allowed; box-shadow:none;}
+  #titleNote{font-size:.72rem; color:#6b5a3e; margin-top:6px; min-height:1.2em;}
+
   #toast{
     position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(90px);
     background:#2e2418; color:#ecdcb2; border:1px solid var(--gold); border-radius:10px;
@@ -114,6 +157,7 @@
   <header>
     <h1>Pilgrim</h1>
     <div class="sub">The Road to the Celestial City · Act I</div>
+    <button id="muteBtn" title="Toggle sound">🔊</button>
   </header>
 
   <div id="status"></div>
@@ -138,9 +182,34 @@
         <div id="dlgChoices"></div>
       </div>
     </div>
+    <div id="battleOverlay">
+      <div id="battleCard">
+        <span class="glyph">🐉</span>
+        <h2>Apollyon</h2>
+        <div id="battleHpLabel"><span>Apollyon</span><span id="battleHpNum"></span></div>
+        <div id="battleHpBar"><div id="battleFill"></div></div>
+        <div id="battleTelegraph"></div>
+        <div id="battleLog"></div>
+        <div id="battleActions">
+          <button id="battleAttack" class="choice">⚔ Sword of the Spirit</button>
+          <button id="battleBlock" class="choice">🛡 Shield of Faith</button>
+          <button id="battleStand" class="choice">⛰ Stand Firm</button>
+          <button id="battleCry" class="choice">🕊 Cry Out</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer>Walk with arrow keys / WASD or the pad · walk into people, doors &amp; things to engage them</footer>
+</div>
+<div id="titleScreen">
+  <div id="titleCard">
+    <h1>Pilgrim</h1>
+    <div class="sub">The Road to the Celestial City</div>
+    <button id="newGameBtn" class="choice">Begin the Journey</button>
+    <button id="continueBtn" class="choice">Continue</button>
+    <div id="titleNote"></div>
+  </div>
 </div>
 <div id="toast"></div>
 

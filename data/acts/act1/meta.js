@@ -18,6 +18,12 @@ export const flags = {
   room1:false, room2:false, room3:false, room4:false
 };
 
+// Replays this act's one LIVE-tile mutation (the gate) after a save is
+// loaded, since buildMaps() always rebuilds LIVE from the pristine MAPS.
+export function reapplyWorld(S, LIVE){
+  if(S.flags.gateOpen) LIVE.world[11][50] = '=';
+}
+
 export function objective(S){
   const f = S.flags;
   if(f.act1Ended) return "Act I complete — wander freely, or begin again.";

@@ -1,6 +1,7 @@
 import {S, player, LIVE, buildMaps, resetState, setCur} from './state.js';
 import {toast} from './dom.js';
 import {ACTIONS as CONTENT_ACTIONS, ITEMS, MAPS, FIRST_ACT} from '../../data/index.js';
+import {sfxRestart} from './audio.js';
 
 /* Thin dispatcher: 'restart' is the one engine-level action; everything
    else is looked up in the merged per-act ACTIONS registry, so a new act
@@ -10,6 +11,7 @@ export function doAct(name){
     resetState(FIRST_ACT.startMap, FIRST_ACT.startCoords);
     buildMaps(MAPS);
     ITEMS.forEach(i=>i.taken=false);
+    sfxRestart();
     return;
   }
   const fn = CONTENT_ACTIONS[name];
