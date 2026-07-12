@@ -3,6 +3,9 @@ import {LIVE, S, player, cur} from './state.js';
 import {NPCS, ITEMS} from '../../data/index.js';
 import {BASE_PAL, SPR} from '../sprites.js';
 import {stepNow} from './input.js';
+import {ready as spritesReady, drawSprite} from '../sprite-atlas.js';
+import {TILE_SPRITES} from '../../data/tile-sprites.js';
+import {NPC_SPRITES, PLAYER_SPRITE} from '../../data/npc-sprites.js';
 
 const cv=$("cv"), ctx=cv.getContext("2d");
 const mm=$("minimap"), mctx=mm.getContext("2d");
@@ -30,11 +33,12 @@ function drawShadow(cx,cy,r){
   ctx.beginPath(); ctx.ellipse(cx,cy,r,r*0.4,0,0,7); ctx.fill();
 }
 
-/* draws one 12x16 figure with palette overrides + accessories */
-function drawFigure(rows, ox, oy, u, pal, acc){
+/* draws one 12x16 figure body with palette overrides. 'dress' reshapes the
+   body's own leg/hem pixels, so it lives here rather than in
+   drawAccessories — there's no clean way to overlay a dress on top of
+   fixed-art sprites, which is why dress-wearing NPCs stay procedural. */
+function drawFigureBody(rows, ox, oy, u, pal, dress){
   const P = Object.assign({}, BASE_PAL, pal||{});
-  const a = acc||[];
-  const dress = a.includes('dress');
   for(let r=0;r<16;r++){
     const row=rows[r];
     for(let c=0;c<12;c++){
@@ -46,6 +50,13 @@ function drawFigure(rows, ox, oy, u, pal, acc){
     }
   }
   if(dress){ ctx.fillStyle=P.T; ctx.fillRect(ox+2.5*u, oy+12*u, 7*u, 3.6*u); }
+}
+
+/* pure overlays (no body-pixel dependency) — usable on top of either the
+   procedural body above or a real sprite's fixed art. */
+function drawAccessories(ox, oy, u, pal, acc){
+  const P = Object.assign({}, BASE_PAL, pal||{});
+  const a = acc||[];
   if(a.includes('beard')){
     ctx.fillStyle=P.H;
     ctx.fillRect(ox+3*u, oy+4*u, 6*u, 1.4*u);
@@ -73,12 +84,31 @@ function drawFigure(rows, ox, oy, u, pal, acc){
   }
 }
 
-/* NPC render: big figures, optional per-NPC scale (e.g. 0.68 for children) */
+function drawFigure(rows, ox, oy, u, pal, acc){
+  drawFigureBody(rows, ox, oy, u, pal, (acc||[]).includes('dress'));
+  drawAccessories(ox, oy, u, pal, acc);
+}
+
+/* NPC render: real sprite when mapped in data/npc-sprites.js (accessories
+   still layered on via drawAccessories), else the original procedural
+   figure. Optional per-NPC scale (e.g. 0.68 for children) applies either way. */
 function drawNPC(n, px, py){
-  const u=(TILE/10)*(n.scale||1), h=16*u;
+  const scale = n.scale||1;
+  const u=(TILE/10)*scale, h=16*u;
   const ox=px+(TILE-12*u)/2, oy=py+TILE-h+u*0.5;
-  drawShadow(px+TILE/2, py+TILE-2, TILE*0.36*(n.scale||1));
-  drawFigure(SPR.down[0], ox, oy, u, n.pal, n.acc);
+  drawShadow(px+TILE/2, py+TILE-2, TILE*0.36*scale);
+
+  const skin = NPC_SPRITES[n.id];
+  if(skin && spritesReady()){
+    const size = TILE*scale;
+    drawSprite(ctx, 'urban', skin.col, skin.bandRow, px+(TILE-size)/2, py+TILE-size, size);
+    // approximate the procedural figure's bounding box, for accessory placement over the sprite
+    const u2 = (TILE/16)*scale;
+    drawAccessories(px+(TILE-12*u2)/2, py+TILE-16*u2, u2, n.pal, n.acc);
+  } else {
+    drawFigure(SPR.down[0], ox, oy, u, n.pal, n.acc);
+  }
+
   if((n.acc||[]).includes('child')){
     const cu=u*0.62, ch=16*cu;
     drawFigure(SPR.down[0], ox+11*u, py+TILE-ch+cu*0.5, cu, {H:'#6e4a22', T:'#7a8c5b', U:'#69794d', P:'#4a3b2a'}, []);
@@ -102,7 +132,16 @@ function drawPlayer(px,py){
     ctx.strokeStyle=packS; ctx.strokeRect(side, oy+5.6*u, 4.2*u, 5.4*u);
   }
 
-  drawFigure(rows, ox, oy, u, null, []);
+  /* No up/left/right poses were found in the sprite sheet (see the item-2
+     plan) — the player shows a single down-facing skin, animated across
+     its 3-frame walk cycle. Facing is still tracked (used above/below for
+     the burden pack's side and the swamp/rescue logic in movement.js). */
+  if(spritesReady()){
+    const walkFrame = moving ? player.step % 3 : 0;
+    drawSprite(ctx, 'urban', PLAYER_SPRITE.col, PLAYER_SPRITE.bandRow + walkFrame, px, py, TILE);
+  } else {
+    drawFigure(rows, ox, oy, u, null, []);
+  }
 
   if(S.burden && player.face==='up'){
     ctx.fillStyle=packC; ctx.fillRect(ox+2.4*u, oy+5.8*u, 7.2*u, 5.2*u);
@@ -186,6 +225,11 @@ function drawFlames(px,py,scale,baseY){
 const EXHIBIT_COLORS = {1:'#9aa3a8', 2:'#c74a10', 3:'#5b6e8c', 4:'#3a3a42'};
 
 function drawTile(t,x,y,px,py){
+  const sprite = TILE_SPRITES[t];
+  if(sprite && spritesReady()){
+    drawSprite(ctx, sprite.sheet, sprite.col, sprite.row, px, py, TILE);
+    return;
+  }
   switch(t){
     case '.': {
       ctx.fillStyle = n2(x,y,5)===0? '#3f6b34':'#456f38';
