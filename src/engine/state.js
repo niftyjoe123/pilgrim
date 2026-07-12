@@ -2,8 +2,12 @@ import {toast} from './dom.js';
 
 /* Pure game state. Owns S/player/LIVE/cur; every other module reads them
    (ES module imports are live bindings) but only this module ever reassigns
-   `cur`, or reassigns the contents of S/player/LIVE (always in place —
-   never `S = ...` — so importers' references stay valid across a restart). */
+   `cur`, or touches the contents of S/player/LIVE (always in place — never
+   `S = ...`, and never replacing S.flags/verses/items wholesale either —
+   so importers' references, including nested ones, stay valid across a
+   restart). player's initial x/y is a placeholder (0,0): main.js sets the
+   real starting position from the first act's meta.js before anything
+   renders, so that's the one source of truth for where a run begins. */
 
 export const START = {
   faith:2, hope:2, endurance:2, wisdom:2, resolve:10, maxResolve:10,
@@ -13,8 +17,8 @@ export const START = {
           room1:false, room2:false, room3:false, room4:false }
 };
 
-export const S = structuredClone(START);
-export const player = {x:6, y:5, face:'down', step:0, moveT:0};
+export const S = JSON.parse(JSON.stringify(START));
+export const player = {x:0, y:0, face:'down', step:0, moveT:0};
 export let cur = 'home';
 export function setCur(name){ cur = name; }
 
@@ -45,7 +49,14 @@ export function addVerse(v){
 }
 
 export function resetState(startMap, startCoords){
-  Object.assign(S, structuredClone(START));
+  const fresh = JSON.parse(JSON.stringify(START));
+  for(const k in fresh){
+    if(k === 'flags' || k === 'verses' || k === 'items') continue;
+    S[k] = fresh[k];
+  }
+  Object.assign(S.flags, fresh.flags);
+  S.verses.length = 0;
+  S.items.length = 0;
   Object.assign(player, {x:startCoords.x, y:startCoords.y, face:'down', step:0, moveT:0});
   setCur(startMap);
 }
