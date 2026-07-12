@@ -17,6 +17,11 @@ apollyonVictory:{glyph:'✝', title:'Apollyon Flees', text:[
  onEnd:{verse:{ref:'James 4:7', text:'Resist the devil, and he will flee from you.'}},
  choices:[{label:'Give thanks, bind your wounds, and go on.', act:'apollyonWon', toast:'⚔ Apollyon is defeated!', end:true}]},
 
+shadow_dread:{glyph:'😰', title:'The Valley of the Shadow of Death', text:[
+  'The road narrows into deep darkness. On one hand a ditch, on the other a dangerous quag — and between them, only the narrowest path, and voices that are not quite voices, murmuring just past what you can make out.',
+  `<p class="speech">Every step feels like it might be your last. And yet — somehow — your feet keep finding the path.</p>`],
+ choices:[{label:'Keep to the center, and press on by feel more than sight.', fx:{faith:1}, toast:'+1 Faith', act:'shadowPassed', end:true}]},
+
 faithful:{glyph:'🚶', title:'Faithful', text:[
   'A familiar figure catches up to you on the road — a fellow-townsman, fled from the City of Destruction not long after you did.',
   `<p class="speech">"Christian! I hoped to overtake you. Shall we go on together, as companions?"</p>`],

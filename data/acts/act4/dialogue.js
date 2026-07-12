@@ -35,10 +35,20 @@ hopeful_joins:{glyph:'🤝', title:'Hopeful', text:[
   `<p class="speech">"My name is Hopeful," he says. "Faithful's death has done more for me alive than all his words could have. I am done with Vanity Fair. Will you have me as a companion?"</p>`],
  choices:[{label:'"Gladly — and welcome." Walk on together.', fx:{hope:1, love:1}, toast:'+1 Hope, +1 Love', act:'vanityFairDone', end:true}]},
 
+hopeful_walk:{glyph:'🤝', title:'Hopeful', text:[
+  `<p class="speech">"Steady on," Hopeful says with a smile. "We'll get there together."</p>`],
+ choices:[{label:'Nod, and keep walking.', end:true}]},
+
 byends:{glyph:'💰', title:'By-ends', text:[
   'A well-dressed traveler named By-ends catches up with you, along with two companions — Mr. Money-love and Mr. Save-all. He is glad to walk with pilgrims, he says, "so long as the times and the company favor it."',
   `<p class="speech">"Why bear such hardship," he asks, "when a little bending of your principles could see you through so much easier?"</p>`],
  choices:[{label:'"We will not change our minds for the world\'s good favor." Walk on without him.', fx:{wisdom:1}, toast:'+1 Wisdom · By-ends and his friends fall behind, unwilling to walk the harder road.', act:'metByends', end:true}]},
+
+meadow_warning:{glyph:'😟', title:'A Weary Traveler', text:[
+  'A shaken traveler hurries past, coming from the direction of the soft meadow ahead.',
+  `<p class="speech">"Don't go that way unless you're sure of what you carry," she warns. "I went in with nothing to my name but good intentions — and good intentions don't open locked doors."</p>`,
+  'She hurries on toward the plain road without another word.'],
+ choices:[{label:'Weigh her warning, and choose your road.', end:true}]},
 
 giantDespair_key:{glyph:'👹', title:'Giant Despair', text:[
   'A giant of a man named Despair looms over the cell, laughing at your plight. "There is no way out of Doubting Castle," he says, "save by the grave."',
@@ -48,14 +58,15 @@ giantDespair_key:{glyph:'👹', title:'Giant Despair', text:[
 
 giantDespair_nokey:{glyph:'👹', title:'Giant Despair', text:[
   'A giant of a man named Despair looms over the cell, laughing at your plight. "There is no way out of Doubting Castle," he says, "save by the grave."',
-  'He locks the door and leaves you in the dark, with nothing in your hands but the plain conviction that a promise once made is not so easily broken — even here.'],
- onEnd:{verse:{ref:'Micah 7:8', text:'When I fall, I shall arise; when I sit in darkness, the LORD shall be a light unto me.'}},
- choices:[{label:'Search every corner, every day, undiscouraged — until, at last, a stone gives way.', fx:{endurance:1, resolve:-2}, toast:'−2 Resolve, +1 Endurance · You break free at last.', act:'castleEscaped', end:true}]},
+  'You search every corner, every day. There is no key, no loose stone, no answer to your prayers that you can find. The despair he is named for begins to feel less like his and more like your own.',
+  `<p class="speech">You remember, too late, a small warm key you might have carried with you from the very start of this road — and did not.</p>`],
+ choices:[{label:'There is no way through. Begin the journey again.', act:'restart', end:true}]},
 
 act4Finale:{glyph:'🌄', title:'End of Act IV', text:[
   'The road rises again, out of shadow and into open country. Ahead, the Delectable Mountains catch the last light — a resting place, they say, before the road grows hard once more.',
   '<b>— ACT IV COMPLETE —</b>'],
  choices:[
+  {label:'Continue toward the Delectable Mountains.', act:'startAct5', end:true},
   {label:'View your pilgrim\'s record.', next:'summary'},
   {label:'Keep wandering the map.', end:true},
   {label:'Begin the journey again.', act:'restart'}]}

@@ -1,4 +1,4 @@
-import {LIVE, S, player, cur, setCur, addVerse, applyFx} from './state.js';
+import {LIVE, S, player, cur, setCur, addVerse, applyFx, pushTrail} from './state.js';
 import {toast} from './dom.js';
 import {openDlg, renderStatus, dlgOpen} from './ui.js';
 import {WARPS, NPCS, ITEMS, MAP_NAMES, actOf} from '../../data/index.js';
@@ -13,6 +13,7 @@ function itemAt(x,y){ return ITEMS.find(i=>i.map===cur&&i.x===x&&i.y===y&&!i.tak
 
 export function warpTo(w){
   setCur(w.map); player.x=w.x; player.y=w.y; player.moveT=performance.now();
+  pushTrail();
   if(MAP_NAMES[cur]) toast('📍 '+MAP_NAMES[cur]);
   renderStatus();
   saveGame();
@@ -57,6 +58,7 @@ export function tryStep(dx,dy){
   }
   if(BLOCKED.has(t)) return;
   player.x=nx; player.y=ny; player.step++; player.moveT=performance.now();
+  pushTrail();
 
   const it=itemAt(nx,ny);
   if(it){

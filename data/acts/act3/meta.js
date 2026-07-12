@@ -13,7 +13,7 @@ export const mapNames = {
 export const flags = {
   metShepherd:false, apollyonMet:false, apollyonDefeated:false,
   apollyonStandFirmBonus:false, apollyonCryOutBonus:false,
-  metFaithful:false, act3Ended:false
+  shadowPassed:false, metFaithful:false, act3Ended:false
 };
 
 export function objective(S){
@@ -21,6 +21,7 @@ export function objective(S){
   if(f.act3Ended) return "Act III complete — wander freely, or begin again.";
   if(f.apollyonMet && !f.apollyonDefeated) return "Stand your ground — there is no way around Apollyon.";
   if(!f.apollyonDefeated) return "Descend into the Valley of Humiliation. Something blocks the way ahead.";
-  if(!f.metFaithful) return "Press on through the Valley of the Shadow of Death.";
+  if(!f.shadowPassed) return "Keep to the narrow path through the Valley of the Shadow of Death.";
+  if(!f.metFaithful) return "Press on out of the shadow.";
   return "Follow the road on, toward what lies beyond.";
 }

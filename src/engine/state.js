@@ -40,6 +40,17 @@ export function buildMaps(mapsSource){
   for(const k in mapsSource) LIVE[k] = mapsSource[k].map(r=>r.split(''));
 }
 
+/* Recent player positions, most-recent first, capped — lets a companion
+   NPC (one with a `follow` predicate, see render.js's companionPos) trail
+   a few steps behind the player instead of standing still. Recorded by
+   movement.js after every successful step and every warp. */
+export const trail = [];
+const TRAIL_MAX = 60;
+export function pushTrail(){
+  trail.unshift({x:player.x, y:player.y, map:cur});
+  if(trail.length > TRAIL_MAX) trail.length = TRAIL_MAX;
+}
+
 export function applyFx(fx){
   if(!fx) return;
   for(const k in fx){
@@ -64,6 +75,7 @@ export function resetState(startMap, startCoords){
   Object.assign(S.flags, fresh.flags);
   S.verses.length = 0;
   S.items.length = 0;
+  trail.length = 0;
   Object.assign(player, {x:startCoords.x, y:startCoords.y, face:'down', step:0, moveT:0});
   setCur(startMap);
 }

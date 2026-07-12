@@ -14,6 +14,8 @@ export const ACTIONS = {
     S.resolve = Math.min(S.maxResolve, S.resolve + 2);
   },
 
+  shadowPassed({S}){ S.flags.shadowPassed = true; },
+
   metFaithful({S}){ S.flags.metFaithful = true; },
 
   // Reached from Act II's finale choice — see data/acts/act2/dialogue.js.
