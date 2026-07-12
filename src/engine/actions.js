@@ -1,4 +1,4 @@
-import {S, player, LIVE, buildMaps, resetState} from './state.js';
+import {S, player, LIVE, buildMaps, resetState, setCur} from './state.js';
 import {toast} from './dom.js';
 import {ACTIONS as CONTENT_ACTIONS, ITEMS, MAPS, FIRST_ACT} from '../../data/index.js';
 
@@ -13,5 +13,5 @@ export function doAct(name){
     return;
   }
   const fn = CONTENT_ACTIONS[name];
-  if(fn) fn({S, player, LIVE, toast});
+  if(fn) fn({S, player, LIVE, toast, setCur});
 }

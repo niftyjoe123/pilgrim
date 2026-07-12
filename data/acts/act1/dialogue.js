@@ -164,10 +164,11 @@ cross:{glyph:'✝', title:'The Cross', text:[
   {label:'Stand a while, and weep, and sing — then take the road with springs in your heels.',
    act:'crossDone', toast:'The Burden is gone. Resolve restored!', end:true}]},
 
-finale:{glyph:'🌄', title:'End of Act I', text:[
+act1Finale:{glyph:'🌄', title:'End of Act I', text:[
   'You are lighter than you have been in years — but the road is long. Beyond this ridge wait the <b>Hill Difficulty</b>, the <b>Palace Beautiful</b>… and in the valley past it, a fiend called <b>Apollyon</b> does not intend to let you pass.',
   '<b>— ACT I COMPLETE —</b>'],
  choices:[
+  {label:'Continue toward the Hill Difficulty.', act:'startAct2', end:true},
   {label:'View your pilgrim\'s record.', next:'summary'},
   {label:'Keep wandering the map.', end:true},
   {label:'Begin the journey again.', act:'restart'}]},

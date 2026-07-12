@@ -1,8 +1,8 @@
 import {LIVE, S, player, cur, setCur, addVerse, applyFx} from './state.js';
 import {toast} from './dom.js';
 import {openDlg, renderStatus, dlgOpen} from './ui.js';
-import {WARPS, NPCS, ITEMS, MAP_NAMES} from '../../data/index.js';
-import {BLOCKED} from '../../data/tiles.js';
+import {WARPS, NPCS, ITEMS, MAP_NAMES, actOf} from '../../data/index.js';
+import {BLOCKED, HAZARDS} from '../../data/tiles.js';
 
 function tileAt(x,y){ const M=LIVE[cur]; return (M[y]&&M[y][x])||'#'; }
 function npcAt(x,y){ return NPCS.find(n=>n.map===cur&&n.x===x&&n.y===y&&!(n.gone&&n.gone())); }
@@ -15,6 +15,7 @@ export function warpTo(w){
 }
 
 let lastSwampToast=0;
+const lastHazardToast={}; // per-glyph, so bumping two different hazards close together doesn't suppress the second
 export function tryStep(dx,dy){
   if(dlgOpen) return;
   player.face = dx===1?'right' : dx===-1?'left' : dy===1?'down' : 'up';
@@ -23,15 +24,29 @@ export function tryStep(dx,dy){
   const npc=npcAt(nx,ny);
   if(npc){ openDlg(npc.dlg()); return; }
   if(t==='g'){ openDlg(S.flags.metEvangelist? 'gate':'gate_locked'); return; }
+  if(t==='A'){ openDlg(S.flags.scrollLost ? 'arbor_found' : 'arbor'); return; }
   if(t==='D'||t==='I'||t==='X'){
     const w=WARPS[cur+':'+nx+','+ny];
     if(w) warpTo(w);
     return;
   }
-  if(t>='1'&&t<='4'){
+  if(t>='1'&&t<='6'){
+    // digits 1-9 are a shared "numbered exhibit" pool across every act's
+    // interiors (Act I's Interpreter pictures use 1-4) — pick unused digits
+    // per new exhibit, since the flag name below is global, not per-map.
     const n='room'+t;
     if(!S.flags[n]){ S.flags[n]=true; openDlg(n); }
-    else toast('You have looked long at this picture already.');
+    else toast('You have looked long at this already.');
+    return;
+  }
+  if(HAZARDS[t]){
+    const now=Date.now();
+    if(now-(lastHazardToast[t]||0)>1800){
+      lastHazardToast[t]=now;
+      S.resolve=Math.max(1,S.resolve-HAZARDS[t].cost);
+      toast(HAZARDS[t].message);
+      renderStatus();
+    }
     return;
   }
   if(BLOCKED.has(t)) return;
@@ -65,5 +80,17 @@ export function tryStep(dx,dy){
     else { toast('The hill still smokes. You know better now.'); player.y+=1; }
   }
   if(t==='+' && !S.flags.crossDone){ openDlg('cross'); }
-  if(t==='E' && !S.flags.ended){ S.flags.ended=true; renderStatus(); openDlg('finale'); }
+  if(t==='E'){
+    // 'E' (act-end) is shared across every act's map, but flags/dialogue
+    // ids are a flat global namespace — so the "ended" flag and the
+    // finale dialogue are namespaced per-act (actId + 'Ended' / 'Finale')
+    // rather than the literal 'ended'/'finale' Act I originally used.
+    const act = actOf(cur);
+    const endedFlag = act.id + 'Ended';
+    if(!S.flags[endedFlag]){
+      S.flags[endedFlag] = true;
+      renderStatus();
+      openDlg(act.id + 'Finale');
+    }
+  }
 }

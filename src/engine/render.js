@@ -183,7 +183,7 @@ function drawFlames(px,py,scale,baseY){
   }
 }
 
-const EXHIBIT_COLORS = {1:'#9aa3a8', 2:'#c74a10', 3:'#5b6e8c', 4:'#3a3a42'};
+const EXHIBIT_COLORS = {1:'#9aa3a8', 2:'#c74a10', 3:'#5b6e8c', 4:'#3a3a42', 5:'#7a5c3a', 6:'#8b6b2a'};
 
 function drawTile(t,x,y,px,py){
   switch(t){
@@ -373,7 +373,7 @@ function drawTile(t,x,y,px,py){
       ctx.moveTo(px+TILE*0.5,py+TILE*0.7); ctx.lineTo(px+TILE*0.3,py+TILE*0.45); ctx.lineTo(px+TILE*0.7,py+TILE*0.45);
       ctx.closePath(); ctx.fill();
       break; }
-    case '1': case '2': case '3': case '4': {
+    case '1': case '2': case '3': case '4': case '5': case '6': {
       ctx.fillStyle='#4a3a26'; ctx.fillRect(px,py,TILE,TILE);
       const seen=S.flags['room'+t];
       ctx.fillStyle='#d4a017'; ctx.fillRect(px+TILE*0.12,py+TILE*0.08,TILE*0.76,TILE*0.84);
@@ -381,6 +381,32 @@ function drawTile(t,x,y,px,py){
       if(!seen){
         drawStar(px+TILE*0.5, py+TILE*0.5, TILE*0.12, 0.5+0.5*Math.sin(performance.now()/400+ +t));
       }
+      break; }
+    case 'A': { // arbor bench — a resting spot part-way up the hill
+      ctx.fillStyle='#456f38'; ctx.fillRect(px,py,TILE,TILE);
+      ctx.fillStyle='#2e5526';
+      ctx.beginPath(); ctx.arc(px+TILE*0.5,py+TILE*0.32,TILE*0.42,0,7); ctx.fill();
+      ctx.fillStyle='#6e5638'; ctx.fillRect(px+TILE*0.22,py+TILE*0.55,TILE*0.56,TILE*0.14);
+      ctx.fillStyle='#4a3a24';
+      ctx.fillRect(px+TILE*0.26,py+TILE*0.69,TILE*0.08,TILE*0.22);
+      ctx.fillRect(px+TILE*0.66,py+TILE*0.69,TILE*0.08,TILE*0.22);
+      break; }
+    case 'L': { // chained lion — trial of faith, roars but does no harm on the true path
+      ctx.fillStyle='#456f38'; ctx.fillRect(px,py,TILE,TILE);
+      ctx.fillStyle='#b8860b';
+      ctx.beginPath(); ctx.arc(px+TILE*0.5,py+TILE*0.55,TILE*0.3,0,7); ctx.fill();
+      ctx.fillStyle='#8b6b2a';
+      ctx.beginPath(); ctx.arc(px+TILE*0.5,py+TILE*0.4,TILE*0.24,0,7); ctx.fill();
+      ctx.fillStyle='#2b2115';
+      ctx.fillRect(px+TILE*0.4,py+TILE*0.36,TILE*0.06,TILE*0.06);
+      ctx.fillRect(px+TILE*0.54,py+TILE*0.36,TILE*0.06,TILE*0.06);
+      break; }
+    case '!': { // hidden pit — a near-miss scare on the road to Destruction
+      ctx.fillStyle='#456f38'; ctx.fillRect(px,py,TILE,TILE);
+      ctx.fillStyle='#1a140e';
+      ctx.beginPath(); ctx.ellipse(px+TILE*0.5,py+TILE*0.55,TILE*0.34,TILE*0.22,0,0,7); ctx.fill();
+      ctx.strokeStyle='#0a0806'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.ellipse(px+TILE*0.5,py+TILE*0.55,TILE*0.34,TILE*0.22,0,0,7); ctx.stroke();
       break; }
     default: ctx.fillStyle='#456f38'; ctx.fillRect(px,py,TILE,TILE);
   }

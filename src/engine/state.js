@@ -10,11 +10,9 @@ import {toast} from './dom.js';
    renders, so that's the one source of truth for where a run begins. */
 
 export const START = {
-  faith:2, hope:2, endurance:2, wisdom:2, resolve:10, maxResolve:10,
+  faith:2, hope:2, endurance:2, wisdom:2, humility:2, love:2, resolve:10, maxResolve:10,
   burden:true, verses:[], items:[],
-  flags:{ metEvangelist:false, obstinateGone:false, sinaiDone:false, gateOpen:false,
-          roomsSeen:0, interpreterDone:false, crossDone:false, helpMet:false, ended:false,
-          room1:false, room2:false, room3:false, room4:false }
+  flags:{} // populated by initFlags() at boot from every act's own meta.js defaults
 };
 
 export const S = JSON.parse(JSON.stringify(START));
@@ -24,8 +22,17 @@ export function setCur(name){ cur = name; }
 
 export const STAT_META = {
   faith:{icon:"✝", name:"Faith"}, hope:{icon:"🕊", name:"Hope"},
-  endurance:{icon:"⛰", name:"Endurance"}, wisdom:{icon:"📖", name:"Wisdom"}
+  endurance:{icon:"⛰", name:"Endurance"}, wisdom:{icon:"📖", name:"Wisdom"},
+  humility:{icon:"🙏", name:"Humility"}, love:{icon:"❤", name:"Love"}
 };
+
+/* Each act's meta.js owns its own flag defaults (see data/acts/act1/meta.js);
+   data/index.js merges them all into FLAGS and main.js calls this once at
+   boot, before anything reads S.flags. Keeps state.js act-agnostic. */
+export function initFlags(defaults){
+  Object.assign(START.flags, defaults);
+  Object.assign(S.flags, defaults);
+}
 
 export const LIVE = {};
 export function buildMaps(mapsSource){

@@ -12,9 +12,15 @@ export const mapNames = {
   interp:"The House of the Interpreter"
 };
 
+export const flags = {
+  metEvangelist:false, obstinateGone:false, sinaiDone:false, gateOpen:false,
+  roomsSeen:0, interpreterDone:false, crossDone:false, helpMet:false, act1Ended:false,
+  room1:false, room2:false, room3:false, room4:false
+};
+
 export function objective(S){
   const f = S.flags;
-  if(f.ended) return "Act I complete — wander freely, or begin again.";
+  if(f.act1Ended) return "Act I complete — wander freely, or begin again.";
   if(!f.metEvangelist) return "The Burden grows heavy. Leave your house and seek counsel in the fields east of the city.";
   if(!f.gateOpen) return "Reach the Wicket Gate in the great wall, far to the east. Beware the swamp.";
   if(!f.interpreterDone) return "Enter the Interpreter's House north of the road, and look at its living pictures.";
