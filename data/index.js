@@ -22,10 +22,18 @@ import {ITEMS as act3Items} from './acts/act3/items.js';
 import {DLG as act3Dlg} from './acts/act3/dialogue.js';
 import {ACTIONS as act3Actions} from './acts/act3/actions.js';
 
+import * as act4Meta from './acts/act4/meta.js';
+import {MAPS as act4Maps, WARPS as act4Warps} from './acts/act4/maps.js';
+import {NPCS as act4Npcs} from './acts/act4/npcs.js';
+import {ITEMS as act4Items} from './acts/act4/items.js';
+import {DLG as act4Dlg} from './acts/act4/dialogue.js';
+import {ACTIONS as act4Actions} from './acts/act4/actions.js';
+
 const acts = [
   {meta: act1Meta, maps: act1Maps, warps: act1Warps, npcs: act1Npcs, items: act1Items, dlg: act1Dlg, actions: act1Actions},
   {meta: act2Meta, maps: act2Maps, warps: act2Warps, npcs: act2Npcs, items: act2Items, dlg: act2Dlg, actions: act2Actions},
-  {meta: act3Meta, maps: act3Maps, warps: act3Warps, npcs: act3Npcs, items: act3Items, dlg: act3Dlg, actions: act3Actions}
+  {meta: act3Meta, maps: act3Maps, warps: act3Warps, npcs: act3Npcs, items: act3Items, dlg: act3Dlg, actions: act3Actions},
+  {meta: act4Meta, maps: act4Maps, warps: act4Warps, npcs: act4Npcs, items: act4Items, dlg: act4Dlg, actions: act4Actions}
 ];
 
 export const MAPS = {};

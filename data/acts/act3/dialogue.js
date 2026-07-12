@@ -26,6 +26,7 @@ act3Finale:{glyph:'🌄', title:'End of Act III', text:[
   'The Valley of the Shadow of Death lies behind you, and the sun is up. Faithful walks beside you now, and the road ahead no longer feels quite so lonely.',
   '<b>— ACT III COMPLETE —</b>'],
  choices:[
+  {label:'Continue toward Vanity Fair.', act:'startAct4', end:true},
   {label:'View your pilgrim\'s record.', next:'summary'},
   {label:'Keep wandering the map.', end:true},
   {label:'Begin the journey again.', act:'restart'}]}
