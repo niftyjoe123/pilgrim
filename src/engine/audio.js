@@ -24,7 +24,7 @@ export function initAudio(){
   try { ctx = new AC(); } catch(e){ return; }
 
   masterGain = ctx.createGain();
-  musicGain = ctx.createGain(); musicGain.gain.value = 0.16;
+  musicGain = ctx.createGain(); musicGain.gain.value = 0.22;
   sfxGain = ctx.createGain(); sfxGain.gain.value = 0.32;
   musicGain.connect(masterGain); sfxGain.connect(masterGain);
   masterGain.connect(ctx.destination);
@@ -42,24 +42,55 @@ export function toggleMute(){
   return muted;
 }
 
-// A slow, quiet two-note drone with a gentle filter sweep — meant to sit
-// under the game without demanding attention. Loops forever via sustained
-// oscillators rather than a sample loop.
+// A2/E3 root pad (quiet, sustained, just for warmth) plus a slow, generative
+// melody wandering over an A minor pentatonic scale — spaced notes with soft
+// attack/release and real rests between them, so it reads as gentle ambient
+// music rather than a held drone. Each note self-schedules the next one.
+const SCALE = [220.00, 261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33]; // A3 C4 D4 E4 G4 A4 C5 D5
+let lastNoteIdx = -1;
+
 function startAmbient(){
   const now = ctx.currentTime;
-  const osc1 = ctx.createOscillator(); osc1.type = 'sine'; osc1.frequency.value = 110;    // A2
-  const osc2 = ctx.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = 164.81; // E3
+  const pad1 = ctx.createOscillator(); pad1.type = 'sine'; pad1.frequency.value = 110;    // A2
+  const pad2 = ctx.createOscillator(); pad2.type = 'sine'; pad2.frequency.value = 164.81; // E3
 
   const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.045;
   const lfoGain = ctx.createGain(); lfoGain.gain.value = 60;
   const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 260; filter.Q.value = 0.6;
   lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
 
-  const swell = ctx.createGain(); swell.gain.value = 0;
-  osc1.connect(filter); osc2.connect(filter); filter.connect(swell); swell.connect(musicGain);
+  const padGain = ctx.createGain(); padGain.gain.value = 0;
+  pad1.connect(filter); pad2.connect(filter); filter.connect(padGain); padGain.connect(musicGain);
 
-  osc1.start(now); osc2.start(now); lfo.start(now);
-  swell.gain.linearRampToValueAtTime(1, now + 4);
+  pad1.start(now); pad2.start(now); lfo.start(now);
+  padGain.gain.linearRampToValueAtTime(0.3, now + 5);
+
+  setTimeout(scheduleMelodyNote, 2500);
+}
+
+function scheduleMelodyNote(){
+  if(!ctx) return;
+  // step by a small scale interval rather than jumping fully at random, so
+  // the melody wanders instead of scattering — an easy way to sound composed
+  let idx = lastNoteIdx < 0
+    ? Math.floor(SCALE.length / 2)
+    : Math.max(0, Math.min(SCALE.length - 1, lastNoteIdx + (Math.floor(Math.random()*5) - 2)));
+  lastNoteIdx = idx;
+
+  const dur = 1.6 + Math.random() * 1.4;
+  const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = SCALE[idx];
+  const g = ctx.createGain(); g.gain.value = 0;
+  o.connect(g); g.connect(musicGain);
+
+  const t0 = ctx.currentTime;
+  const peak = 0.16 + Math.random() * 0.08;
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(peak, t0 + 0.5);
+  g.gain.linearRampToValueAtTime(0, t0 + dur);
+  o.start(t0); o.stop(t0 + dur + 0.1);
+
+  const rest = 900 + Math.random() * 2000;
+  setTimeout(scheduleMelodyNote, (dur * 1000) + rest);
 }
 
 function tone(freq, startOffset, dur, type, peak){
