@@ -2,7 +2,17 @@ export const id = 'act5';
 export const title = 'Act V: The Delectable Mountains to the Celestial City';
 
 export const startMap = 'mountains';
-export const startCoords = {x:2, y:4};
+export const startCoords = {x:2, y:5};
+
+// Walkable story-region tiles (merged into data/index.js's TRIGGERS):
+// entering the region opens its dialogue until the flag is set by the
+// dialogue's own choices — the place itself is the encounter, no person
+// standing in for it.
+export const triggers = {
+  n: {flag:'metEnchanted', dlg:'enchanted_ground'},
+  B: {flag:'metBeulah',    dlg:'beulah'},
+  W: {flag:'riverCrossed', dlg:'river_edge'}
+};
 
 export const maps = ['mountains', 'celestial'];
 

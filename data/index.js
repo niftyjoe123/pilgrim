@@ -52,6 +52,11 @@ export const DLG = {};
 export const MAP_NAMES = {};
 export const ACTIONS = {};
 export const FLAGS = {};
+// Walkable story-region tiles: glyph → {flag, dlg}. Stepping onto the glyph
+// opens `dlg` until `flag` is set (the dialogue's own choices set it) — how
+// a *place* (Beulah Land, the River of Death) is an encounter without a
+// person standing in for it. Declared per-act in meta.js as `triggers`.
+export const TRIGGERS = {};
 const mapToAct = {};
 
 for(const act of acts){
@@ -63,6 +68,7 @@ for(const act of acts){
   Object.assign(MAP_NAMES, act.meta.mapNames);
   Object.assign(ACTIONS, act.actions);
   Object.assign(FLAGS, act.meta.flags);
+  Object.assign(TRIGGERS, act.meta.triggers || {});
   for(const mapName of act.meta.maps) mapToAct[mapName] = act.meta;
 }
 

@@ -1,11 +1,11 @@
-import {player, setCur, buildMaps, initFlags} from './engine/state.js';
-import {MAPS, FIRST_ACT, FLAGS} from '../data/index.js';
+import {player, cur, setCur, buildMaps, initFlags} from './engine/state.js';
+import {MAPS, FIRST_ACT, FLAGS, actOf} from '../data/index.js';
 import {renderStatus} from './engine/ui.js';
 import {$, toast} from './engine/dom.js';
 import {initInput} from './engine/input.js';
 import {initRender} from './engine/render.js';
 import {hasSave, loadGame, clearSave, initAutosave} from './engine/save.js';
-import {initAudio, toggleMute, isMuted} from './engine/audio.js';
+import {initAudio, toggleMute, isMuted, setMood} from './engine/audio.js';
 
 initFlags(FLAGS);
 
@@ -15,6 +15,7 @@ function boot(startToast){
   renderStatus();
   initAutosave();
   toast(startToast);
+  setMood(actOf(cur).id);
 }
 
 function newGame(){

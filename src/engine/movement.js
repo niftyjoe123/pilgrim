@@ -1,10 +1,10 @@
 import {LIVE, S, player, cur, setCur, addVerse, applyFx, pushTrail} from './state.js';
 import {toast} from './dom.js';
 import {openDlg, renderStatus, dlgOpen} from './ui.js';
-import {WARPS, NPCS, ITEMS, MAP_NAMES, actOf} from '../../data/index.js';
+import {WARPS, NPCS, ITEMS, MAP_NAMES, TRIGGERS, actOf} from '../../data/index.js';
 import {BLOCKED, HAZARDS} from '../../data/tiles.js';
 import {saveGame} from './save.js';
-import {sfxPickup, sfxWarp, sfxHazard} from './audio.js';
+import {sfxPickup, sfxWarp, sfxHazard, setMood} from './audio.js';
 import {isBattleOpen} from './battle.js';
 
 function tileAt(x,y){ const M=LIVE[cur]; return (M[y]&&M[y][x])||'#'; }
@@ -18,6 +18,8 @@ export function warpTo(w){
   renderStatus();
   saveGame();
   sfxWarp();
+  const act = actOf(cur);
+  if(act) setMood(act.id);
 }
 
 let lastSwampToast=0;
@@ -69,6 +71,10 @@ export function tryStep(dx,dy){
     saveGame();
     sfxPickup();
   }
+  // story-region tiles (see data/index.js's TRIGGERS): entering the region
+  // opens its dialogue until the dialogue's own choices set the flag
+  const trg=TRIGGERS[t];
+  if(trg && !S.flags[trg.flag]){ openDlg(trg.dlg); return; }
   if(t==='~'){
     const cost = S.burden? 2:1;
     S.resolve=Math.max(1,S.resolve-cost);

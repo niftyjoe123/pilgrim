@@ -2,7 +2,7 @@ export const id = 'act4';
 export const title = 'Act IV: Vanity Fair and Doubting Castle';
 
 export const startMap = 'fairroad';
-export const startCoords = {x:2, y:4};
+export const startCoords = {x:2, y:6};
 
 export const maps = ['fairroad', 'castle'];
 

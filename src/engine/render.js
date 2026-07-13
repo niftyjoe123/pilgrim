@@ -121,13 +121,15 @@ function drawDragon(ox, oy, u){
   ctx.globalAlpha=1;
 }
 
-/* NPC render: big figures, optional per-NPC scale (e.g. 0.68 for children) */
-function drawNPC(n, px, py){
+/* NPC render: big figures, optional per-NPC scale (e.g. 0.68 for children).
+   face/frame are used by companions, which turn and walk with the player —
+   static NPCs default to standing face-down. */
+function drawNPC(n, px, py, face, frame){
   const u=(TILE/10)*(n.scale||1), h=16*u;
   const ox=px+(TILE-12*u)/2, oy=py+TILE-h+u*0.5;
   drawShadow(px+TILE/2, py+TILE-2, TILE*0.36*(n.scale||1));
   if(n.monster==='dragon') drawDragon(ox, oy, u);
-  else drawFigure(SPR.down[0], ox, oy, u, n.pal, n.acc);
+  else drawFigure(SPR[face||'down'][frame||0], ox, oy, u, n.pal, n.acc);
   if((n.acc||[]).includes('child')){
     const cu=u*0.62, ch=16*cu;
     drawFigure(SPR.down[0], ox+11*u, py+TILE-ch+cu*0.5, cu, {H:'#6e4a22', T:'#7a8c5b', U:'#69794d', P:'#4a3b2a'}, []);
@@ -552,6 +554,128 @@ function drawTile(t,x,y,px,py){
       ctx.strokeRect(px+1,py+1,TILE-2,TILE-2);
       if(n2(x,y,11)===0){ ctx.fillStyle='rgba(20,20,24,.3)'; ctx.fillRect(px+TILE*0.3,py+TILE*0.6,TILE*0.4,2); }
       break; }
+    case 'B': { // Beulah Land — flowering fields, heavy with color
+      ctx.fillStyle = n2(x,y,3)===0 ? '#4f7a3e' : '#578244';
+      ctx.fillRect(px,py,TILE,TILE);
+      const petals=['#e8b4c8','#f0e68c','#e8e2d0','#d88a5a','#b48ad8'];
+      ctx.fillStyle=petals[n2(x,y,5)];
+      ctx.beginPath(); ctx.arc(px+TILE*(0.2+0.1*n2(x,y,6)), py+TILE*(0.25+0.1*n2(y,x,5)), TILE*0.07, 0, 7); ctx.fill();
+      ctx.fillStyle=petals[n2(y,x,5)];
+      ctx.beginPath(); ctx.arc(px+TILE*(0.55+0.08*n2(x+1,y,4)), py+TILE*(0.6+0.08*n2(y,x+1,4)), TILE*0.06, 0, 7); ctx.fill();
+      ctx.fillStyle='#ffd75e';
+      ctx.fillRect(px+TILE*(0.3+0.1*n2(x,y+1,4)), py+TILE*(0.45+0.1*n2(x+1,y+1,3)), 2.5, 2.5);
+      break; }
+    case 'n': { // the Enchanted Ground — pale, warm, drowsy haze
+      ctx.fillStyle = n2(x,y,3)===0 ? '#8a8468' : '#948e72';
+      ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='rgba(232,226,200,.28)'; ctx.lineWidth=1.5;
+      const o = Math.sin(performance.now()/900 + x*1.3 + y)*3;
+      ctx.beginPath(); ctx.moveTo(px+4, py+TILE*0.5+o);
+      ctx.bezierCurveTo(px+TILE*0.35, py+TILE*0.32+o, px+TILE*0.65, py+TILE*0.68+o, px+TILE-4, py+TILE*0.5+o);
+      ctx.stroke();
+      if(n2(x,y,6)===1){ ctx.fillStyle='rgba(240,235,210,.3)'; ctx.fillRect(px+TILE*0.3, py+TILE*0.25, 3, 3); }
+      break; }
+    case 'W': { // deep river water — the River of Death, and the river of life
+      ctx.fillStyle = n2(x,y,3)===0 ? '#1f3350' : '#24395a';
+      ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='rgba(160,190,220,.3)'; ctx.lineWidth=1.5;
+      const o = n2(x,y,4)*2 + Math.sin(performance.now()/500 + x*1.7 + y)*2.5;
+      ctx.beginPath(); ctx.moveTo(px+5,py+TILE*0.35+o); ctx.quadraticCurveTo(px+TILE/2,py+TILE*0.25+o,px+TILE-5,py+TILE*0.35+o); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px+8,py+TILE*0.72+o*0.6); ctx.quadraticCurveTo(px+TILE/2,py+TILE*0.62+o*0.6,px+TILE-8,py+TILE*0.72+o*0.6); ctx.stroke();
+      break; }
+    case 'l': { // the river of the water of life — bright, clear as crystal
+      ctx.fillStyle = n2(x,y,3)===0 ? '#7db8d8' : '#8cc4e0';
+      ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='rgba(255,255,255,.5)'; ctx.lineWidth=1.5;
+      const lo = n2(x,y,4)*2 + Math.sin(performance.now()/450 + x*1.5 + y)*2;
+      ctx.beginPath(); ctx.moveTo(px+5,py+TILE*0.4+lo); ctx.quadraticCurveTo(px+TILE/2,py+TILE*0.3+lo,px+TILE-5,py+TILE*0.4+lo); ctx.stroke();
+      if(n2(x,y,5)===1){
+        const ltw=0.5+0.5*Math.sin(performance.now()/350 + x*3 + y*2);
+        ctx.globalAlpha=0.6*ltw; ctx.fillStyle='#ffffff';
+        ctx.fillRect(px+TILE*0.4+n2(y,x,4)*2, py+TILE*0.6, 2.5, 2.5);
+        ctx.globalAlpha=1;
+      }
+      break; }
+    case 'Y': { // streets of gold
+      ctx.fillStyle = (x+y)%2 ? '#d8b84a' : '#e0c258';
+      ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='rgba(140,100,20,.25)'; ctx.lineWidth=1;
+      ctx.strokeRect(px+0.5,py+0.5,TILE-1,TILE-1);
+      if(n2(x,y,6)===2){
+        const tw=0.4+0.4*Math.sin(performance.now()/450 + x*2 + y*3);
+        drawStar(px+TILE*(0.3+0.08*n2(x,y,5)), py+TILE*(0.3+0.09*n2(y,x,5)), TILE*0.08, tw*0.7);
+      }
+      break; }
+    case 'Z': { // the City's shining wall — pearl and gold, alive with light
+      const zg = ctx.createLinearGradient(px,py,px,py+TILE);
+      zg.addColorStop(0,'#fdf6dd'); zg.addColorStop(1,'#e3cf8e');
+      ctx.fillStyle=zg; ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='rgba(180,150,60,.4)'; ctx.lineWidth=1;
+      const zoff=(y%2)*TILE*0.5;
+      for(let bx=-TILE*0.5; bx<TILE*1.5; bx+=TILE*0.5){
+        ctx.beginPath(); ctx.moveTo(px+bx+zoff,py); ctx.lineTo(px+bx+zoff,py+TILE); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(px,py+TILE*0.5); ctx.lineTo(px+TILE,py+TILE*0.5); ctx.stroke();
+      const ztw=0.3+0.4*Math.sin(performance.now()/600 + x*1.3 + y*2.1);
+      ctx.globalAlpha=ztw; ctx.fillStyle='#ffffff';
+      ctx.fillRect(px+TILE*0.2+n2(x,y,5)*2, py+TILE*0.15+n2(y,x,4)*3, 3, 3);
+      ctx.globalAlpha=1;
+      break; }
+    case 'U': { // the tree of life — luminous, golden-fruited
+      ctx.fillStyle=(x+y)%2 ? '#d8b84a' : '#e0c258';
+      ctx.fillRect(px,py,TILE,TILE);
+      ctx.fillStyle='rgba(0,0,0,.12)';
+      ctx.beginPath(); ctx.ellipse(px+TILE/2,py+TILE*0.85,TILE*0.3,TILE*0.1,0,0,7); ctx.fill();
+      const ug=0.5+0.3*Math.sin(performance.now()/700 + x + y);
+      ctx.globalAlpha=0.25*ug; ctx.fillStyle='#fff7d0';
+      ctx.beginPath(); ctx.arc(px+TILE/2,py+TILE*0.4,TILE*0.44,0,7); ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.fillStyle='#8a6b45'; ctx.fillRect(px+TILE*0.44,py+TILE*0.55,TILE*0.12,TILE*0.3);
+      ctx.fillStyle='#7dc95e';
+      ctx.beginPath(); ctx.arc(px+TILE/2,py+TILE*0.4,TILE*0.32,0,7); ctx.fill();
+      ctx.fillStyle='#a8e88c';
+      ctx.beginPath(); ctx.arc(px+TILE*0.42,py+TILE*0.32,TILE*0.14,0,7); ctx.fill();
+      ctx.fillStyle='#ffd75e';
+      ctx.beginPath(); ctx.arc(px+TILE*0.36,py+TILE*0.45,TILE*0.05,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(px+TILE*0.6,py+TILE*0.3,TILE*0.05,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(px+TILE*0.62,py+TILE*0.5,TILE*0.05,0,7); ctx.fill();
+      break; }
+    case 'K': { // Doubting Castle's outer wall — grim, battlemented
+      ctx.fillStyle='#2e3138'; ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='#1e2026'; ctx.lineWidth=1;
+      const koff=(y%2)*TILE*0.5;
+      for(let bx=-TILE*0.5; bx<TILE*1.5; bx+=TILE*0.5){
+        ctx.beginPath(); ctx.moveTo(px+bx+koff,py); ctx.lineTo(px+bx+koff,py+TILE); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(px,py+TILE*0.5); ctx.lineTo(px+TILE,py+TILE*0.5); ctx.stroke();
+      // crenellated top edge on every tile — reads as battlements in a mass
+      ctx.fillStyle='#15171c';
+      ctx.fillRect(px,py,TILE,3);
+      ctx.fillStyle='#3a3e46';
+      ctx.fillRect(px+TILE*0.08, py, TILE*0.22, 5);
+      ctx.fillRect(px+TILE*0.62, py, TILE*0.22, 5);
+      if(n2(x,y,5)===1){ // a narrow lit arrow-slit, here and there
+        ctx.fillStyle='#0d0f12'; ctx.fillRect(px+TILE*0.44, py+TILE*0.3, TILE*0.12, TILE*0.42);
+        ctx.fillStyle='rgba(255,190,80,.35)'; ctx.fillRect(px+TILE*0.47, py+TILE*0.38, TILE*0.06, TILE*0.2);
+      }
+      break; }
+    case 'a': { // a barred dungeon window in Doubting Castle's wall
+      ctx.fillStyle='#3a3f47'; ctx.fillRect(px,py,TILE,TILE);
+      ctx.strokeStyle='#262a30'; ctx.lineWidth=1;
+      const aoff=(y%2)*TILE*0.5;
+      for(let bx=-TILE*0.5; bx<TILE*1.5; bx+=TILE*0.5){
+        ctx.beginPath(); ctx.moveTo(px+bx+aoff,py); ctx.lineTo(px+bx+aoff,py+TILE); ctx.stroke();
+      }
+      ctx.fillStyle='#101319';
+      ctx.fillRect(px+TILE*0.24, py+TILE*0.2, TILE*0.52, TILE*0.5);
+      ctx.strokeStyle='#565c66'; ctx.lineWidth=2;
+      for(let i=1;i<=3;i++){
+        ctx.beginPath();
+        ctx.moveTo(px+TILE*(0.24+0.13*i), py+TILE*0.2);
+        ctx.lineTo(px+TILE*(0.24+0.13*i), py+TILE*0.7);
+        ctx.stroke();
+      }
+      break; }
     default: ctx.fillStyle='#456f38'; ctx.fillRect(px,py,TILE,TILE);
   }
 }
@@ -601,8 +725,15 @@ function drawMinimap(){
 function companionPos(n){
   const offset = n.followOffset || 5;
   const onMap = trail.filter(t => t.map === cur);
-  const spot = onMap[offset] || onMap[onMap.length - 1];
-  return spot || {x: player.x, y: player.y};
+  const idx = onMap[offset] ? offset : onMap.length - 1;
+  const spot = onMap[idx];
+  if(!spot) return {x: player.x, y: player.y, face:'down'};
+  // face the way the trail moves next (toward the player) — trail is
+  // most-recent-first, so "ahead" is the entry one index earlier
+  const ahead = onMap[Math.max(0, idx - 1)];
+  const dx = ahead.x - spot.x, dy = ahead.y - spot.y;
+  const face = dx===1 ? 'right' : dx===-1 ? 'left' : dy===-1 ? 'up' : 'down';
+  return {x: spot.x, y: spot.y, face};
 }
 
 function draw(){
@@ -627,7 +758,8 @@ function draw(){
     if(n.gone && n.gone()) return;
     if(n.follow && n.follow()){
       const pos = companionPos(n);
-      drawNPC(n, pos.x*TILE-camX, pos.y*TILE-camY);
+      const moving = performance.now() - player.moveT < 220;
+      drawNPC(n, pos.x*TILE-camX, pos.y*TILE-camY, pos.face, moving ? player.step % 2 : 0);
     } else if(n.map===cur){
       drawNPC(n, n.x*TILE-camX, n.y*TILE-camY);
     }

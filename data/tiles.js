@@ -2,7 +2,7 @@
    New interactive tile? Add it here (and to BLOCKED if impassable), add its
    drawTile case in src/engine/render.js, and wire any trigger in
    src/engine/movement.js's tryStep(). */
-export const BLOCKED = new Set(['#','h','w','i','^','r','m','b','t','c','k','p','Q','L','!','M','C','q','j']);
+export const BLOCKED = new Set(['#','h','w','i','^','r','m','b','t','c','k','p','Q','L','!','M','C','q','j','K','Z','U','a']);
 
 /* Generic "impassable + costs Resolve + shows a toast on bump" tiles —
    any act can add a hazard glyph purely as data, no engine changes needed.

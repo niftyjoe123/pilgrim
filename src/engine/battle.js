@@ -9,9 +9,11 @@
    fight stays "turn-based, readable" per the design doc: the player always
    sees what's coming next before they choose their action. */
 import {$} from './dom.js';
-import {S, applyFx} from './state.js';
+import {S, cur, applyFx} from './state.js';
 import {renderStatus, openDlg} from './ui.js';
 import {saveGame} from './save.js';
+import {setMood} from './audio.js';
+import {actOf} from '../../data/index.js';
 
 const MAX_HP = 24;
 const PATTERN = ['claw', 'claw', 'flame', 'claw', 'claw', 'flame'];
@@ -38,6 +40,7 @@ function renderBattle(log){
 
 export function startBattle(){
   open = true; enemyHp = MAX_HP; turn = 0;
+  setMood('battle');
   $('battleOverlay').classList.add('show');
   $('battleAttack').onclick = () => battleAction('attack');
   $('battleBlock').onclick = () => battleAction('block');
@@ -49,6 +52,8 @@ export function startBattle(){
 function endBattle(){
   open = false;
   $('battleOverlay').classList.remove('show');
+  const act = actOf(cur);
+  if(act) setMood(act.id);
 }
 
 export function battleAction(name){
